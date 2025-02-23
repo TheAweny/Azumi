@@ -28,7 +28,7 @@ print(Style.RESET_ALL)
 
 # CONST's #
 TOKEN = os.environ["YOUR_BOT_TOKEN"]
-JOIN_ROLE = 1342976859658256405
+
 
 
 # EVENTS #

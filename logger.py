@@ -23,7 +23,7 @@ class ColorFormatter(logging.Formatter):
         logging.INFO: Back.WHITE + Style.BRIGHT + " %(asctime)s " + Back.GREEN + " INFO " + Style.RESET_ALL + Fore.LIGHTWHITE_EX + " %(message)s" + Style.RESET_ALL,
         logging.WARNING: Back.WHITE + Style.BRIGHT + " %(asctime)s " + Back.YELLOW + " WARNING " + Style.RESET_ALL + Fore.LIGHTYELLOW_EX + " %(message)s" + Style.RESET_ALL,
         logging.ERROR: Back.WHITE + Style.BRIGHT + " %(asctime)s " + Back.RED + " ERROR " + Style.RESET_ALL + Fore.LIGHTRED_EX + " %(message)s" + Style.RESET_ALL,
-        logging.CRITICAL: Back.WHITE + Style.BRIGHT + " %(asctime)s " + Back.MAGENTA + " CRITICAL " + Style.RESET_ALL + Fore.LIGHTMAGENTA_EX + " %(message)s" + Style.RESET_ALL
+        logging.CRITICAL: Back.WHITE + Style.BRIGHT + " %(asctime)s " + Back.RED + " CRITICAL " + Style.RESET_ALL + Fore.RED + " %(message)s" + Style.RESET_ALL,
     }
 
     def format(self, record):

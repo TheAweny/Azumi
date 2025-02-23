@@ -19,6 +19,10 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_any_role(*kickPermission)
     async def kick(self, ctx, member: disnake.Member, *, reason: str = "Не указана"):
+        if member == ctx.author:
+            await ctx.reply(f"{ctx.author.mention}, ты не можешь кикнуть самого себя. <:blueheart:1343318324624232501>", delete_after=15)
+            await ctx.message.delete(delay=15)
+            return
         await self.kick_action(ctx, member, reason)
 
     @commands.slash_command(name="kick", description="Кикнуть участника с сервера.")
@@ -26,6 +30,9 @@ class Moderation(commands.Cog):
     async def kick_slash(self, inter: disnake.ApplicationCommandInteraction,
                          member: disnake.Member,
                          reason: str = "Не указана"):
+        if inter.author == member:
+            await inter.send(f"{inter.author.mention}, ты не можешь кикнуть самого себя. <:blueheart:1343318324624232501>", ephemeral=True)
+            return
         await self.kick_action(inter, member, reason)
 
     async def kick_action(self, ctx, member: disnake.Member, reason: str):
@@ -51,10 +58,19 @@ class Moderation(commands.Cog):
               f"Модератор {ctx.author} кикнул {member} | Причина: {reason}" + Style.RESET_ALL)
 
     @kick.error
-    @kick_slash.error
     async def kick_error(self, ctx, error):
         if isinstance(error, commands.MissingAnyRole):
             await ctx.reply("<:cross:1343199131354665043> У вас недостаточно прав для использования этой команды.")
+            print(
+                Back.RED + f" Permission Error " + Back.WHITE + f" {ctx.command.qualified_name} " + Style.RESET_ALL + f" User: {ctx.author} ({ctx.author.id})")
+        else:
+            raise
+
+
+    @kick_slash.error
+    async def kick_error(self, ctx, error):
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.send(f"<:cross:1343199131354665043> {ctx.author.mention}, у вас недостаточно прав для использования этой команды.")
             print(
                 Back.RED + f" Permission Error " + Back.WHITE + f" {ctx.command.qualified_name} " + Style.RESET_ALL + f" User: {ctx.author} ({ctx.author.id})")
         else:
@@ -62,4 +78,4 @@ class Moderation(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Moderation(bot))  # Добавляем ког в бота
+    bot.add_cog(Moderation(bot))
