@@ -6,7 +6,7 @@ from colorama import *
 
 config_path = Path(__file__).resolve().parent.parent / "config.json"
 
-with confg_path.open("r") as config:
+with config_path.open("r") as config:
     config_data = json.load(config)
 
 #   Permissions   #
