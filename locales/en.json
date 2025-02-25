@@ -1,0 +1,13 @@
+{
+  "general": {
+    "commandNotFound": "Apologies... That command doesn't exist.",
+    "noPermissions": "<:cross:1343199131354665043> You don't have enough permissions to use this command.",
+    "onReady": "Azumi is ready to manage servers :3"
+  },
+  "debug": {
+    "commandNotFound": "Non-existent command entered. User: {ctx.author.name} (ID: {ctx.author.id})",
+    "commandError": "Command error: {error}. User: {ctx.author.name} (ID: {ctx.author.id})",
+    "cogLoaded": "Module loaded: {cog}",
+    "cogLoadException": "Failed to load module {cog}. Error: {error}"
+  }
+}

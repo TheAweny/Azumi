@@ -1,0 +1,20 @@
+{
+  "general": {
+    "commandNotFound": "Упс... Такой команды нет.",
+    "noPermissions": "<:cross:1343199131354665043> У вас недостаточно прав для использования этой команды.",
+    "onReady": "Азуми готова управлять серверами :3"
+  },
+  "debug": {
+    "commandNotFound": "Ввод несуществующей команды. Пользователь: {ctx.author.name} (ID: {ctx.author.id})",
+    "commandError": "Ошибка в командах: {error}. Пользователь: {ctx.author.name} (ID: {ctx.author.id})",
+    "cogLoaded": "Загружен модуль: {cog}",
+    "cogLoadException": "Не удалось загрузить модуль {cog}. Ошибка: {error}"
+  },
+
+  "commands": {
+    "ping": {
+      "title": "\uD83C\uDFD3 Pong!",
+      "field": "\uD83E\uDD16 Задержка бота"
+    }
+  }
+}
