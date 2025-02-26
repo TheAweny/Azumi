@@ -5,11 +5,10 @@ from pathlib import Path
 from colorama import *
 from settings import getConfig, getLocale
 
-config_data = getConfig()
-locale_data = getLocale()
+
 
 #   Permissions   #
-ping = config_data["permissions"]["ping"]
+ping = getConfig()["permissions"]["ping"]
 
 
 class Ping(commands.Cog):
@@ -25,15 +24,15 @@ class Ping(commands.Cog):
             title=getLocale()["commands"]["ping"]["title"],
             color=disnake.Color.blurple()
         )
-        embed.add_field(name="🤖 Задержка бота", value=f"{bot_latency} ms", inline=False)
-        embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1342942230083538990/0776e5775f168c55f11fce7ff198a4c8?size=256&quot")
+        embed.add_field(name=getLocale()["commands"]["ping"]["field"], value=f"{bot_latency} ms", inline=False)
+        embed.set_thumbnail(url=getConfig()["commands"]["ping"]["thumbnail"])
 
         await ctx.reply(embed=embed)
 
     @ping.error
     async def ping_error(self, ctx, error):
         if isinstance(error, commands.MissingAnyRole):
-            await ctx.reply(config_data[f"Text"]["noPermissions"])
+            await ctx.reply(getLocale()["general"]["noPermissions"])
             print(
                 Back.RED + f" Permission Error " + Back.WHITE + f" {ctx.command.qualified_name} " + Style.RESET_ALL + f" User: {ctx.author} ({ctx.author.id})")
         else:

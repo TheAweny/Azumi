@@ -1,4 +1,17 @@
 ﻿{
+  "settings": {
+    "botName": "Azumi",
+    "prefix": "!",
+    "join_role": 1342976859658256405,
+    "locale": "ru",
+
+    "Redis": {
+      "host": "localhost",
+      "port": 6379,
+      "password": "password",
+      "db": 0
+    }
+  },
 
   "permissions": {
     "ban": [1343182881572524145],
@@ -8,9 +21,9 @@
     "ping": [1343190505592455209, 1343322203466371092]
   },
 
-  "settings": {
-    "prefix": "!",
-    "join_role": 1342976859658256405,
-    "locale": "en"
+  "commands": {
+    "ping": {
+      "thumbnail": "https://cdn.discordapp.com/avatars/1342942230083538990/0776e5775f168c55f11fce7ff198a4c8?size=256&quot"
+    }
   }
 }

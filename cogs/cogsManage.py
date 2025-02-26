@@ -1,6 +1,7 @@
 from disnake.ext import commands
 import disnake
 import os
+from settings import getConfig, getLocale
 
 class CogManager(commands.Cog):
     def __init__(self, bot):
@@ -11,18 +12,18 @@ class CogManager(commands.Cog):
     async def load_cog(self, inter: disnake.ApplicationCommandInteraction, cog: str):
         try:
             self.bot.load_extension(f"cogs.{cog}")
-            await inter.response.send_message(f"✅ Cog `{cog}` загружен!", ephemeral=True)
+            await inter.response.send_message(getLocale()["commands"]["cogManage"]["load"].format(cog=cog), ephemeral=True)
         except Exception as e:
-            await inter.response.send_message(f"❌ Ошибка при загрузке `{cog}`: {e}", ephemeral=True)
+            await inter.response.send_message(getLocale()["commands"]["cogManage"]["loadError"].format(cog=cog, error=e), ephemeral=True)
 
     @commands.slash_command(name="unload", description="Выгрузить указанный Cog")
     @commands.is_owner()
     async def unload_cog(self, inter: disnake.ApplicationCommandInteraction, cog: str):
         try:
             self.bot.unload_extension(f"cogs.{cog}")
-            await inter.response.send_message(f"✅ Cog `{cog}` выгружен!", ephemeral=True)
+            await inter.response.send_message(getLocale()["commands"]["cogManage"]["unload"].format(cog=cog), ephemeral=True)
         except Exception as e:
-            await inter.response.send_message(f"❌ Ошибка при выгрузке `{cog}`: {e}", ephemeral=True)
+            await inter.response.send_message(getLocale()["commands"]["cogManage"]["unloadError"].format(cog=cog, error=e), ephemeral=True)
 
     @commands.slash_command(name="reload", description="Перезагрузить указанный Cog")
     @commands.is_owner()
@@ -30,9 +31,9 @@ class CogManager(commands.Cog):
         try:
             self.bot.unload_extension(f"cogs.{cog}")
             self.bot.load_extension(f"cogs.{cog}")
-            await inter.response.send_message(f"🔄 Cog `{cog}` перезагружен!", ephemeral=True)
+            await inter.response.send_message(getLocale()["commands"]["cogManage"]["reload"].format(cog=cog), ephemeral=True)
         except Exception as e:
-            await inter.response.send_message(f"❌ Ошибка при перезагрузке `{cog}`: {e}", ephemeral=True)
+            await inter.response.send_message(getLocale()["commands"]["cogManage"]["reloadError"].format(cog=cog, error=e), ephemeral=True)
 
 
 def setup(bot):
