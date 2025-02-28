@@ -1,13 +1,63 @@
 {
   "general": {
-    "commandNotFound": "Apologies... That command doesn't exist.",
-    "noPermissions": "<:cross:1343199131354665043> You don't have enough permissions to use this command.",
-    "onReady": "Azumi is ready to manage servers :3"
+    "commandNotFound": "Oops... No such command.",
+    "noPermissions": "<:cross:1343199131354665043> You do not have enough permissions to use this command.",
+    "onReady": "Azumi is ready to manage servers :3",
+    "defaultReason": "Not specified",
+    "autoUnban": "🔓 {user} has been automatically unbanned on the server {guild}.",
+    "error": "❌ An error occurred. Please try again later."
   },
   "debug": {
-    "commandNotFound": "Non-existent command entered. User: {ctx.author.name} (ID: {ctx.author.id})",
+    "commandNotFound": "Attempt to enter a non-existent command. User: {ctx.author.name} (ID: {ctx.author.id})",
     "commandError": "Command error: {error}. User: {ctx.author.name} (ID: {ctx.author.id})",
     "cogLoaded": "Module loaded: {cog}",
-    "cogLoadException": "Failed to load module {cog}. Error: {error}"
+    "cogLoadException": "Failed to load module {cog}. Error: {error}",
+
+    "redisConnected": "✅ Successfully connected to the Redis database.",
+    "redisConnectionError": "❌ Error connecting to the Redis database. Check the configuration in config.json",
+
+    "autoUnbanError": "⚠️ Error processing temporary bans. Automatic unban is not possible. Error: {error}."
+  },
+  
+  "commands": {
+    "ping": {
+      "title": "🏓 Pong!",
+      "field": "🤖 Bot latency"
+    },
+    "cogManage": {
+      "load": "✅ Cog `{cog}` loaded!",
+      "loadError": "❌ Error loading `{cog}`: {error}",
+      "unload": "✅ Cog `{cog}` unloaded!",
+      "unloadError": "❌ Error unloading `{cog}`: {error}",
+      "reload": "🔄 Cog `{cog}` reloaded!",
+      "reloadError": "❌ Error reloading `{cog}`: {error}"
+    },
+    "moderation": {
+      "kick": {
+        "selfKick": "{authorMention}, you cannot kick yourself.",
+        "highRole": "{authorMention}, you cannot kick a user with a higher role.",
+
+        "embed": {
+          "title": "🚨 Server Kick",
+          "description": "**{memberMention} has been kicked**",
+          "field": "📌 Reason",
+          "moderator": "🔨 Moderator: {moderatorMention}"
+        }
+      },
+      "ban": {
+        "selfBan": "{authorMention}, you cannot ban yourself.",
+        "highRole": "{authorMention}, you cannot ban a user with a higher role.",
+        "invalidTime": "The ban duration is not a valid number.",
+
+        "embed": {
+          "title": "🚨 Server Ban",
+          "description": "**{memberMention} has been banned**",
+          "field": "📌 Reason",
+          "moderator": "🔨 Moderator: {moderatorMention}",
+          "banMessage": "You have been banned from the server {guildMention} for {time}. Reason: {reason}",
+          "banMessageError": "Failed to send ban notification. User: {memberMention} (ID: {member.id})"
+        }
+      }
+    }
   }
 }

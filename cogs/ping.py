@@ -3,7 +3,7 @@ from disnake.ext import commands
 import json
 from pathlib import Path
 from colorama import *
-from settings import getConfig, getLocale
+from functions import getConfig, getLocale
 
 
 

@@ -1,7 +1,7 @@
 from disnake.ext import commands
 import disnake
 import os
-from settings import getConfig, getLocale
+from functions import getConfig, getLocale
 
 class CogManager(commands.Cog):
     def __init__(self, bot):
