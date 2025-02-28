@@ -1,4 +1,6 @@
-﻿# MODULES #
+﻿
+
+# MODULES #
 from logger import get_logger
 import colorama
 import disnake

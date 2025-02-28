@@ -6,9 +6,9 @@
     "locale": "ru",
 
     "Redis": {
-      "host": "YOUR REDIS HOST",
-      "port": "YOUR REDIS PORT",
-      "password": "YOUR REDIS PASSWORD",
+      "host": "redis-10780.c85.us-east-1-2.ec2.redns.redis-cloud.com",
+      "port": 10780,
+      "password": "fUfawSICLvk6BwsUgRBIlnpbozcnIbYq",
       "db": 0
     }
   },
