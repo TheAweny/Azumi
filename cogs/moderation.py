@@ -787,7 +787,6 @@ class Moderation(commands.Cog):
         if not warn_ids:
             return
         
-        # Подсчитываем только активные предупреждения
         current_time = int(time.time())
         active_warns = 0
         
@@ -796,7 +795,6 @@ class Moderation(commands.Cog):
             if warn_data_json:
                 try:
                     warn_data = json.loads(warn_data_json)
-                    # Предупреждение активно если оно бессрочное или не истекло
                     if warn_data.get("expiry") is None or warn_data.get("expiry") > current_time:
                         active_warns += 1
                 except json.JSONDecodeError:
@@ -804,7 +802,6 @@ class Moderation(commands.Cog):
         
         warn_threshold = getConfig().get("warning_thresholds", {})
         
-        # Сортируем пороги по убыванию, чтобы применять самое строгое наказание
         thresholds = sorted([int(t) for t in warn_threshold.keys()], reverse=True)
         
         for threshold in thresholds:
@@ -836,10 +833,7 @@ class Moderation(commands.Cog):
                         color=disnake.Color.red()
                     )
                     
-                    if isinstance(ctx, commands.Context):
-                        await ctx.send(embed=embed)
-                    else:
-                        await ctx.response.send_message(embed=embed)
+                    await ctx.send(embed=embed)
                     
                     get_logger().debug(getLocale()["debug"]["moderation"]["warnPunishment"].format(
                         member_name=member.name,
@@ -851,7 +845,7 @@ class Moderation(commands.Cog):
                         punishment_duration=punishment_duration if punishment_duration else "∞"
                     ))
                     
-                    break  # Применяем только одно наказание
+                    break
                     
                 except Exception as e:
                     get_logger().error(f"Ошибка при применении наказания {punishment_type}: {e}")
@@ -875,22 +869,14 @@ class Moderation(commands.Cog):
         user_warns_key = f"warns:{ctx.guild.id}:{member.id}"
         warn_ids = redisConnect.lrange(user_warns_key, 0, -1)
         
+        # Если нет предупреждений, сразу отправляем сообщение об этом
         if not warn_ids:
+            response = getLocale()["moderation"]["actions"]["warn"]["noWarnings"].format(memberMention=member.mention)
             if isinstance(ctx, commands.Context):
-                await ctx.send(getLocale()["moderation"]["actions"]["warn"]["noWarnings"].format(memberMention=member.mention))
+                await ctx.send(response)
             else:
-                await ctx.response.send_message(getLocale()["moderation"]["actions"]["warn"]["noWarnings"].format(memberMention=member.mention))
+                await ctx.response.send_message(response)
             return
-        
-        embed = disnake.Embed(
-            title=getLocale()["moderation"]["actions"]["warn"]["warningsTitle"],
-            description=getLocale()["moderation"]["actions"]["warn"]["warningsDescription"].format(
-                memberMention=member.mention,
-                warnCount=len(warn_ids)
-            ),
-            color=disnake.Color.yellow()
-        )
-        
         
         current_time = int(time.time())
         active_warnings = []
@@ -905,30 +891,58 @@ class Moderation(commands.Cog):
                 except json.JSONDecodeError:
                     continue
         
+        # Если нет активных предупреждений, отправляем сообщение об этом
+        if not active_warnings:
+            response = getLocale()["moderation"]["actions"]["warn"]["noWarnings"].format(memberMention=member.mention)
+            if isinstance(ctx, commands.Context):
+                await ctx.send(response)
+            else:
+                await ctx.response.send_message(response)
+            return
+        
         active_warnings.sort(key=lambda x: x.get("timestamp", 0), reverse=True)
         
-        for i, warn in enumerate(active_warnings[:10], 1):
-            reason = warn.get("reason", getLocale()["general"]["defaultReason"])
-            moderator_id = warn.get("moderator_id", "Unknown")
-            timestamp = warn.get("timestamp", 0)
-            expiry = warn.get("expiry")
+        pages = []
+        warnings_per_page = 10
+        
+        for i in range(0, len(active_warnings), warnings_per_page):
+            page_warnings = active_warnings[i:i + warnings_per_page]
             
-            time_str = f"<t:{timestamp}:R>"
-            expiry_str = f" (Expires <t:{expiry}:R>)" if expiry else ""
-            
-            embed.add_field(
-                name=f"Предупреждение #{i}",
-                value=f"**Причина:** {reason}\n**Модератор:** <@{moderator_id}>\n**Истекает:** {time_str}{expiry_str}",
-                inline=False
+            embed = disnake.Embed(
+                title=getLocale()["moderation"]["actions"]["warn"]["warningsTitle"],
+                description=getLocale()["moderation"]["actions"]["warn"]["warningsDescription"].format(
+                    memberMention=member.mention,
+                    warnCount=len(active_warnings)
+                ),
+                color=disnake.Color.yellow()
             )
+            
+            for j, warn in enumerate(page_warnings, i + 1):
+                reason = warn.get("reason", getLocale()["general"]["defaultReason"])
+                moderator_id = warn.get("moderator_id", "Unknown")
+                timestamp = warn.get("timestamp", 0)
+                expiry = warn.get("expiry")
+                
+                time_str = f"<t:{timestamp}:R>"
+                expiry_str = f" (Истекает <t:{expiry}:R>)" if expiry else ""
+                
+                embed.add_field(
+                    name=f"Предупреждение #{j}",
+                    value=f"**Причина:** {reason}\n**Модератор:** <@{moderator_id}>\n**Выдано:** {time_str}{expiry_str}",
+                    inline=False
+                )
+            
+            if len(active_warnings) > warnings_per_page:
+                embed.set_footer(text=f"Страница {i//warnings_per_page + 1}/{(len(active_warnings)-1)//warnings_per_page + 1}")
+            
+            pages.append(embed)
         
-        if len(active_warnings) > 10:
-            embed.set_footer(text=f"Показано 10 из {len(active_warnings)} активных предупреждений.")
-        
-        if isinstance(ctx, commands.Context):
-            await ctx.send(embed=embed)
-        else:
-            await ctx.response.send_message(embed=embed)
+        # Отправляем первую страницу
+        if pages:  # Проверяем, что список страниц не пустой
+            if isinstance(ctx, commands.Context):
+                await ctx.send(embed=pages[0])
+            else:
+                await ctx.response.send_message(embed=pages[0])
 
     @commands.command()
     @commands.has_any_role(*getConfig()["permissions"]["warn"])

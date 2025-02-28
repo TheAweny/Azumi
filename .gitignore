@@ -1729,3 +1729,6 @@ __pycache__/settings.cpython-312.pyc
 .venv/Lib/site-packages/redis-5.2.1.dist-info/WHEEL
 __pycache__/functions.cpython-312.pyc
 .vscode/settings.json
+cogs/__pycache__/cogsManage.cpython-312.pyc
+cogs/__pycache__/moderation.cpython-312.pyc
+cogs/__pycache__/ping.cpython-312.pyc
