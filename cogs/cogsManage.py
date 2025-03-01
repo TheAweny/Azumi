@@ -12,18 +12,18 @@ class CogManager(commands.Cog):
     async def load_cog(self, inter: disnake.ApplicationCommandInteraction, cog: str):
         try:
             self.bot.load_extension(f"cogs.{cog}")
-            await inter.response.send_message(getLocale()["commands"]["cogManage"]["load"].format(cog=cog), ephemeral=True)
+            await inter.response.send_message(getLocale()["debug"]["cogs"]["manage"]["load"].format(cog=cog), ephemeral=True)
         except Exception as e:
-            await inter.response.send_message(getLocale()["commands"]["cogManage"]["loadError"].format(cog=cog, error=e), ephemeral=True)
+            await inter.response.send_message(getLocale()["debug"]["cogs"]["manage"]["loadError"].format(cog=cog, error=e), ephemeral=True)
 
     @commands.slash_command(name="unload", description="Выгрузить указанный Cog")
     @commands.is_owner()
     async def unload_cog(self, inter: disnake.ApplicationCommandInteraction, cog: str):
         try:
             self.bot.unload_extension(f"cogs.{cog}")
-            await inter.response.send_message(getLocale()["commands"]["cogManage"]["unload"].format(cog=cog), ephemeral=True)
+            await inter.response.send_message(getLocale()["debug"]["cogs"]["manage"]["unload"].format(cog=cog), ephemeral=True)
         except Exception as e:
-            await inter.response.send_message(getLocale()["commands"]["cogManage"]["unloadError"].format(cog=cog, error=e), ephemeral=True)
+            await inter.response.send_message(getLocale()["debug"]["cogs"]["manage"]["unloadError"].format(cog=cog, error=e), ephemeral=True)
 
     @commands.slash_command(name="reload", description="Перезагрузить указанный Cog")
     @commands.is_owner()
@@ -31,9 +31,9 @@ class CogManager(commands.Cog):
         try:
             self.bot.unload_extension(f"cogs.{cog}")
             self.bot.load_extension(f"cogs.{cog}")
-            await inter.response.send_message(getLocale()["commands"]["cogManage"]["reload"].format(cog=cog), ephemeral=True)
+            await inter.response.send_message(getLocale()["debug"]["cogs"]["manage"]["reload"].format(cog=cog), ephemeral=True)
         except Exception as e:
-            await inter.response.send_message(getLocale()["commands"]["cogManage"]["reloadError"].format(cog=cog, error=e), ephemeral=True)
+            await inter.response.send_message(getLocale()["debug"]["cogs"]["manage"]["reloadError"].format(cog=cog, error=e), ephemeral=True)
 
 
 def setup(bot):

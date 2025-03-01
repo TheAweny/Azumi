@@ -13,7 +13,7 @@ from datetime import datetime
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot  # Подключаем бота
+        self.bot = bot  
 
 
 
@@ -27,7 +27,7 @@ class Moderation(commands.Cog):
             await ctx.message.delete(delay=15)
             return
 
-        # Проверяем, есть ли у кикера права выше, чем у цели
+        
         if ctx.author.top_role <= member.top_role:
             await ctx.reply(getLocale()["errors"]["highRole"]["kick"].format(authorMention=ctx.author.mention))
             await ctx.message.delete(delay=15)
@@ -44,7 +44,7 @@ class Moderation(commands.Cog):
             await inter.send(getLocale()["errors"]["selfAction"]["kick"].format(authorMention=inter.author.mention), ephemeral=True)
             return
 
-        # Проверяем, есть ли у кикера права выше, чем у цели
+        
         if inter.author.top_role <= member.top_role:
             await inter.send(getLocale()["errors"]["highRole"]["kick"].format(authorMention=inter.author.mention), ephemeral=True)
             return
@@ -61,7 +61,7 @@ class Moderation(commands.Cog):
         embed.add_field(name=getLocale()["moderation"]["common"]["moderator"], value=ctx.author.mention, inline=False)
         embed.set_thumbnail(url=member.avatar.url if member.avatar else ctx.guild.icon.url)
 
-        # Проверка, является ли ctx обычным сообщением или слеш-командой
+        
         if isinstance(ctx, commands.Context):
             await ctx.send(embed=embed)
             await ctx.message.delete(delay=15)
@@ -138,14 +138,14 @@ class Moderation(commands.Cog):
 
     async def ban_action(self, ctx, user_id: int, reason: str, ban_time: int = None):
         try:
-            user_obj = disnake.Object(id=user_id)  # Создаём объект пользователя для бана
+            user_obj = disnake.Object(id=user_id)  
 
-            # Сохраняем бан во временном хранилище, если задано время
+            
             if ban_time and ban_time > 0:
                 expiry_time = int(time.time()) + ban_time
                 redisConnect.set(f"ban:{ctx.guild.id}:{user_id}", str(expiry_time))
 
-            # Попытка получить объект пользователя (если он существует)
+            
             user = None
             try:
                 user = await self.bot.fetch_user(user_id)
@@ -159,27 +159,28 @@ class Moderation(commands.Cog):
             except disnake.NotFound:
                 print(f"Пользователь с ID {user_id} не найден, но он всё равно будет забанен.")
 
-            # Бан по ID
+            
             await ctx.guild.ban(user_obj, reason=f"{reason} | Модератор: {ctx.author.name} (ID: {ctx.author.id}) | Время: {ban_time if ban_time else '∞'}")
 
-            # Создание Embed
+            
             embed = disnake.Embed(
                 title=getLocale()["moderation"]["actions"]["ban"]["title"],
                 description=getLocale()["moderation"]["actions"]["ban"]["description"].format(memberMention=f"<@{user_id}>"),
                 color=disnake.Color.red()
             )
-            embed.add_field(name=getLocale()["moderation"]["common"]["reason"], value=reason, inline=False)
-            embed.add_field(name=getLocale()["moderation"]["common"]["moderator"], value=ctx.author.mention, inline=False)
+            embed.add_field(name=getLocale()["moderation"]["common"]["reason"], value=reason, inline=True)
+            embed.add_field(name=getLocale()["moderation"]["common"]["duration"], value=ban_time if ban_time else "∞", inline=True)
+            embed.add_field(name=getLocale()["moderation"]["common"]["moderator"], value=ctx.author.mention, inline=True)
             embed.set_thumbnail(url=user.avatar.url if user and user.avatar else ctx.guild.icon.url)
 
-            # Отправка Embed в чат
+            
             if isinstance(ctx, commands.Context):
                 await ctx.send(embed=embed)
                 await ctx.message.delete(delay=15)
             else:
                 await ctx.response.send_message(embed=embed)
 
-            # Логирование
+            
             get_logger().debug(getLocale()["debug"]["moderation"]["ban"].format(
                 member_name=user.name if user else "Unknown",
                 member_id=user_id,
@@ -198,7 +199,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_any_role(*getConfig()["permissions"]["unban"])
-    async def unban(self, ctx, user: str, *, reason: str = commands.Param(default="Не указана", description="Причина бана")):
+    async def unban(self, ctx, user: str, *, reason: str = getLocale()["info"]["defaultReason"]):
         await self.unban_action(ctx, user, reason)
 
     @commands.slash_command(name="unban", description="Разблокировать пользователя на сервере.")
@@ -206,7 +207,7 @@ class Moderation(commands.Cog):
     async def unban_slash(self, inter: disnake.ApplicationCommandInteraction, user: str = commands.Param(description="ID или @пользователь"), reason: str = commands.Param(default="None", description="Причина бана")):
         await self.unban_action(inter, user, reason)
 
-    async def unban_action(self, ctx, user: str, reason: str = "Не указана"):
+    async def unban_action(self, ctx, user: str, reason: str = getLocale()["info"]["defaultReason"]):
         match = re.match(r'<@!?(\d+)>', user)
         if match:
             user_id = match.group(1)
@@ -321,7 +322,7 @@ class Moderation(commands.Cog):
                 await ctx.response.send_message(getLocale()["errors"]["selfAction"]["mute"].format(authorMention=ctx.author.mention), ephemeral=True)
             return
 
-        # Проверяем, есть ли у мутящего права выше, чем у цели
+        
         if ctx.author.top_role <= member.top_role:
             if isinstance(ctx, commands.Context):
                 await ctx.reply(getLocale()["errors"]["highRole"]["mute"].format(authorMention=ctx.author.mention))
@@ -330,7 +331,6 @@ class Moderation(commands.Cog):
                 await ctx.response.send_message(getLocale()["errors"]["highRole"]["mute"].format(authorMention=ctx.author.mention), ephemeral=True)
             return
 
-        # Конвертируем время
         converted_time = convertTime(time)
         if converted_time is None:
             if isinstance(ctx, commands.Context):
@@ -440,10 +440,8 @@ class Moderation(commands.Cog):
             return
 
         try:
-            # Remove timeout
             await member.timeout(duration=None, reason=f"{reason} | Модератор: {ctx.author.name} (ID: {ctx.author.id})")
             
-            # Create embed response
             embed = disnake.Embed(
                 title="Размут",
                 description=f"Ограничения чата сняты с пользователя {member.mention}",
@@ -569,7 +567,6 @@ class Moderation(commands.Cog):
             else:
                 await ctx.response.send_message(embed=embed)
 
-            # Логирование
             if user:
                 get_logger().debug(getLocale()["debug"]["moderation"]["clearUser"].format(
                     moderator_name=ctx.author.name,
@@ -645,17 +642,15 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_any_role(*getConfig()["permissions"]["warn"])
     async def warn(self, ctx, member: disnake.Member, *args):
-        # Объединяем все аргументы в одну строку
         args_str = ' '.join(args)
         
-        # Проверяем первый аргумент на соответствие формату времени
         time_match = re.match(r'^(\d+[smhd])\s*(.*)', args_str)
         
         if time_match:
             time, reason = time_match.groups()
             reason = reason if reason else getLocale()["general"]["defaultReason"]
         else:
-            time = None
+            time = getConfig()["commands"]["warn"]["defaultTime"]
             reason = args_str if args_str else getLocale()["general"]["defaultReason"]
 
         if member == ctx.author:
@@ -665,6 +660,8 @@ class Moderation(commands.Cog):
         if ctx.author.top_role <= member.top_role:
             await ctx.reply(getLocale()["errors"]["highRole"]["warn"].format(authorMention=ctx.author.mention))
             return
+        
+
         
         await self.warn_action(ctx, member, time, reason)
 
@@ -682,10 +679,13 @@ class Moderation(commands.Cog):
             await inter.send(getLocale()["errors"]["highRole"]["warn"].format(authorMention=inter.author.mention), ephemeral=True)
             return
         
+        
+        
         await self.warn_action(inter, member, time, reason)
 
     async def warn_action(self, ctx, member: str, time: str, reason: str):
         expiry_time = None
+
         
         if time:
             converted_time = convertTime(time)
@@ -805,7 +805,7 @@ class Moderation(commands.Cog):
         thresholds = sorted([int(t) for t in warn_threshold.keys()], reverse=True)
         
         for threshold in thresholds:
-            if active_warns >= threshold:
+            if active_warns == threshold:
                 punishment = warn_threshold[str(threshold)]
                 punishment_type = punishment.get("type")
                 punishment_duration = punishment.get("duration")
@@ -854,7 +854,7 @@ class Moderation(commands.Cog):
     async def warnings(self, ctx, member: disnake.Member = None):
         if member is None:
             member = ctx.author
-        
+
         await self.show_warnings(ctx, member)
 
     @commands.slash_command(name="warnings", description="Показать предупреждения пользователя")
@@ -866,10 +866,14 @@ class Moderation(commands.Cog):
         await self.show_warnings(inter, member)
 
     async def show_warnings(self, ctx, member: disnake.Member):
+
+        
         user_warns_key = f"warns:{ctx.guild.id}:{member.id}"
         warn_ids = redisConnect.lrange(user_warns_key, 0, -1)
+
+
         
-        # Если нет предупреждений, сразу отправляем сообщение об этом
+        
         if not warn_ids:
             response = getLocale()["moderation"]["actions"]["warn"]["noWarnings"].format(memberMention=member.mention)
             if isinstance(ctx, commands.Context):
@@ -891,7 +895,7 @@ class Moderation(commands.Cog):
                 except json.JSONDecodeError:
                     continue
         
-        # Если нет активных предупреждений, отправляем сообщение об этом
+        
         if not active_warnings:
             response = getLocale()["moderation"]["actions"]["warn"]["noWarnings"].format(memberMention=member.mention)
             if isinstance(ctx, commands.Context):
@@ -937,12 +941,19 @@ class Moderation(commands.Cog):
             
             pages.append(embed)
         
-        # Отправляем первую страницу
-        if pages:  # Проверяем, что список страниц не пустой
+        if pages:
             if isinstance(ctx, commands.Context):
                 await ctx.send(embed=pages[0])
             else:
                 await ctx.response.send_message(embed=pages[0])
+
+    @warnings.error
+    async def warnings_error(self, ctx, error):
+        if isinstance(error, commands.MemberNotFound):
+            await ctx.reply(getLocale()["errors"]["userNotFound"])
+        else:
+            await ctx.reply(getLocale()["errors"]["error"])
+
 
     @commands.command()
     @commands.has_any_role(*getConfig()["permissions"]["warn"])
